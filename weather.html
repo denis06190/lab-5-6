@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лабораторна №5–6 — Завдання 2</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f3f6fb; padding: 40px 16px; }
+        .card { max-width: 600px; margin: auto; background: white; padding: 28px;
+                border-radius: 12px; box-shadow: 0 4px 16px #0001; }
+        h1 { font-size: 25px; }
+        label { display: block; margin: 14px 0 6px; }
+        input { width: 100%; box-sizing: border-box; padding: 11px;
+                font-size: 16px; border: 1px solid #aaa; border-radius: 6px; }
+        button { margin-top: 18px; padding: 12px 20px; background: #215ec1;
+                 border: 0; border-radius: 6px; color: #fff; cursor: pointer; }
+        button:hover { background: #174a98; }
+        #weatherResult { margin-top: 20px; background: #e6f1ff; padding: 18px;
+                         border-radius: 8px; min-height: 70px; }
+        #weatherResult p { margin: 8px 0; }
+        a { color: #1659bd; }
+    </style>
+</head>
+<body>
+    <main class="card">
+        <h1>Погода в місті</h1>
+        <form id="weatherForm">
+            <label for="city">Місто:</label>
+            <input type="text" id="city" value="London" required>
+            <label for="apiKey">API-ключ OpenWeatherMap:</label>
+            <input type="password" id="apiKey" placeholder="Вставте свій API-ключ" required>
+            <button type="submit">Дізнатися погоду</button>
+        </form>
+        <div id="weatherResult" aria-live="polite">Введіть API-ключ та натисніть кнопку.</div>
+        <p><a href="index.html">← Назад до завдання 1</a></p>
+    </main>
+
+    <script>
+        const form = document.getElementById("weatherForm");
+        const result = document.getElementById("weatherResult");
+
+        function addLine(text) {
+            const p = document.createElement("p");
+            p.textContent = text;
+            result.appendChild(p);
+        }
+
+        form.addEventListener("submit", async event => {
+            event.preventDefault();
+            const city = document.getElementById("city").value.trim();
+            const apiKey = document.getElementById("apiKey").value.trim();
+
+            if (!city || !apiKey) {
+                result.textContent = "Вкажіть місто та API-ключ.";
+                return;
+            }
+
+            result.textContent = "Завантаження погоди...";
+            const url = "https://api.openweathermap.org/data/2.5/weather"
+                + "?q=" + encodeURIComponent(city)
+                + "&appid=" + encodeURIComponent(apiKey)
+                + "&units=metric&lang=uk";
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.message || "HTTP " + response.status);
+                }
+
+                result.replaceChildren();
+                addLine("Місто: " + data.name);
+                addLine("Температура: " + data.main.temp + " °C");
+                addLine("Вологість: " + data.main.humidity + " %");
+                addLine("Швидкість вітру: " + data.wind.speed + " м/с");
+            } catch (error) {
+                result.textContent = "Не вдалося отримати погоду: " + error.message;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+[
+    "JavaScript",
+    "Python",
+    "Java",
+    "C++",
+    "C#",
+    "PHP",
+    "TypeScript"
+]
